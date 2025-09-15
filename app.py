@@ -1,10 +1,10 @@
-
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
-st.title("📈 Simple Line Chart Visualizer")
+st.title("🔻 Funnel Chart Visualizer")
 
-# 1️⃣ Upload file
+# 1️⃣ Upload CSV
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
 if uploaded_file is not None:
@@ -14,17 +14,14 @@ if uploaded_file is not None:
     st.subheader("Preview of Uploaded Data")
     st.dataframe(df.head())
 
-    # 3️⃣ Let user choose columns for X and Y
-    numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
-    if len(numeric_cols) < 1:
-        st.error("No numeric columns found for plotting.")
-    else:
-        x_axis = st.selectbox("Select column for X-axis", df.columns)
-        y_axis = st.selectbox("Select numeric column for Y-axis", numeric_cols)
+    # 3️⃣ Choose columns
+    cols = df.columns.tolist()
+    stage_col = st.selectbox("Select column for Funnel Stages", cols)
+    value_col = st.selectbox("Select numeric column for Values", df.select_dtypes(include=['int','float']).columns)
 
-        # 4️⃣ Plot line chart
-        st.subheader("Line Chart")
-        st.line_chart(df.set_index(x_axis)[y_axis])
+    # 4️⃣ Plot funnel chart
+    st.subheader("Funnel Chart")
+    fig = px.funnel(df, x=value_col, y=stage_col)
+    st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info("Please upload a CSV file to begin.")
-  
+    st.info("Please upload a CSV file to visualize.")
